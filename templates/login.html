@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Presión Arterial y Glucosa Capilar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #135ba1;
+        }
+        .error {
+            margin-top: 10px;
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Bienvenidos Doctores</h2>
+    <p>Registro de Presión Arterial<br>y Glucosa Capilar</p>
+
+    <input type="text" id="usuario" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+
+    <div id="error" class="error"></div>
+</div>
+
+<script>
+function login() {
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
+
+    fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            usuario: usuario,
+            password: password
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            window.location.href = "/panel";
+        } else {
+            document.getElementById("error").innerText = data.mensaje;
+        }
+    });
+}
+</script>
+
+</body>
+</html>
