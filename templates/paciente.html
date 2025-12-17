@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Paciente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 700px;
+            margin: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            margin-top: 15px;
+            display: block;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row div {
+            flex: 1;
+        }
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Registro de Paciente</h2>
+
+    <label>Nombre del paciente</label>
+    <input type="text">
+
+    <div class="row">
+        <div>
+            <label>Edad</label>
+            <input type="number">
+        </div>
+        <div>
+            <label>Género</label>
+            <select>
+                <option value="">Seleccione</option>
+                <option>Femenino</option>
+                <option>Masculino</option>
+                <option>Otro</option>
+            </select>
+        </div>
+    </div>
+
+    <label>Hipertensión arterial</label>
+    <select>
+        <option value="">Seleccione</option>
+        <option>Sí</option>
+        <option>No</option>
+    </select>
+
+    <label>Diabetes</label>
+    <select>
+        <option value="">Seleccione</option>
+        <option>Sí</option>
+        <option>No</option>
+    </select>
+
+    <label>Desde cuándo (si aplica)</label>
+    <input type="text" placeholder="Ej. 2018">
+
+    <label>Medicamentos actuales</label>
+    <textarea rows="3"></textarea>
+
+    <button>Siguiente</button>
+</div>
+
+</body>
+</html>
