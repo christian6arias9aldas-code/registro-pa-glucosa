@@ -41,6 +41,9 @@ def panel():
     <h2>Bienvenido Dr. Christian Arias</h2>
     <p>Sistema de Registro de Presión Arterial y Glucosa Capilar</p>
     """
+@app.route("/paciente")
+def paciente():
+    return render_template("paciente.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
