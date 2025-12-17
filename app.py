@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import jwt
 import datetime
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "clave_super_secreta"
 
+# Usuarios (luego se guardarán en base de datos)
 usuarios = {
     "carias": {
         "nombre": "Dr. Christian Arias",
@@ -19,31 +20,27 @@ def generar_token(usuario):
     }
     return jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
 
-def token_requerido(f):
-    def wrapper(*args, **kwargs):
-        token = request.headers.get("Authorization")
-        if not token:
-            return jsonify({"mensaje": "Debe iniciar sesión"}), 401
-        try:
-            jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
-        except:
-            return jsonify({"mensaje": "Token inválido o expirado"}), 401
-        return f(*args, **kwargs)
-    wrapper.__name__ = f.__name__
-    return wrapper
+@app.route("/")
+def login_page():
+    return render_template("login.html")
 
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
-    if data["usuario"] in usuarios and data["password"] == usuarios[data["usuario"]]["password"]:
-        token = generar_token(data["usuario"])
-        return jsonify({"token": token})
-    return jsonify({"mensaje": "Credenciales incorrectas"}), 401
+    usuario = data.get("usuario")
+    password = data.get("password")
 
-@app.route("/")
-@token_requerido
-def home():
-    return jsonify({"mensaje": "Bienvenido Dr. Christian Arias"})
+    if usuario in usuarios and password == usuarios[usuario]["password"]:
+        token = generar_token(usuario)
+        return jsonify({"token": token})
+    return jsonify({"mensaje": "Usuario o contraseña incorrectos"}), 401
+
+@app.route("/panel")
+def panel():
+    return """
+    <h2>Bienvenido Dr. Christian Arias</h2>
+    <p>Sistema de Registro de Presión Arterial y Glucosa Capilar</p>
+    """
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
