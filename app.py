@@ -1,40 +1,49 @@
-from flask import Flask, request, jsonify, session
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, request, jsonify
+import jwt
+import datetime
 
 app = Flask(__name__)
-app.secret_key = "clave_super_secreta"
+app.config["SECRET_KEY"] = "clave_super_secreta"
 
-# Usuarios de ejemplo (luego irán a base de datos)
 usuarios = {
     "carias": {
         "nombre": "Dr. Christian Arias",
-        "password": generate_password_hash("123456")
+        "password": "123456"
     }
 }
 
-@app.route("/")
-def home():
-    if "usuario" in session:
-        return jsonify({
-            "mensaje": f"Bienvenido {usuarios[session['usuario']]['nombre']}"
-        })
-    return jsonify({"mensaje": "Debe iniciar sesión"})
+def generar_token(usuario):
+    payload = {
+        "usuario": usuario,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=8)
+    }
+    return jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
+
+def token_requerido(f):
+    def wrapper(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token:
+            return jsonify({"mensaje": "Debe iniciar sesión"}), 401
+        try:
+            jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        except:
+            return jsonify({"mensaje": "Token inválido o expirado"}), 401
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
 
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
-    usuario = data.get("usuario")
-    password = data.get("password")
+    if data["usuario"] in usuarios and data["password"] == usuarios[data["usuario"]]["password"]:
+        token = generar_token(data["usuario"])
+        return jsonify({"token": token})
+    return jsonify({"mensaje": "Credenciales incorrectas"}), 401
 
-    if usuario in usuarios and check_password_hash(usuarios[usuario]["password"], password):
-        session["usuario"] = usuario
-        return jsonify({"mensaje": "Inicio de sesión exitoso"})
-    return jsonify({"mensaje": "Usuario o contraseña incorrectos"}), 401
-
-@app.route("/logout")
-def logout():
-    session.pop("usuario", None)
-    return jsonify({"mensaje": "Sesión cerrada"})
+@app.route("/")
+@token_requerido
+def home():
+    return jsonify({"mensaje": "Bienvenido Dr. Christian Arias"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
